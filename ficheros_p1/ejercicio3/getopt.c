@@ -58,6 +58,12 @@ int main(int argc, char *argv[])
 		case 'h':
 			usage();
 			exit(0);
+		case 'l':
+			
+			exit(0);
+		case 'e':
+			
+			exit(0);
 		default:
 			exit(EXIT_FAILURE);
 		}
