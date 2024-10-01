@@ -84,7 +84,7 @@ passwd_entry_t* parse_passwd(struct options* options, int* nr_entries)
 				strcpy(cur_entry->login_name,token);
 				break;
 			case ENCRYPTED_PASS_IDX:
-				cur_entry->optional_encrypted_passwd=clone_string(token);
+				cur_entry->optional_encrypted_passwd=strdup(token);
 				break;
 			case UID_IDX:
 				if (sscanf(token,"%d",&cur_entry->uid)!=1) {
