@@ -52,18 +52,18 @@ int main(int argc, char *argv[])
 	options.lenght= 10;
 	options.title = NULL;
 
-	/* Parse command-line options */
-	while((opt = getopt(argc, argv, "h")) != -1) {
+	/* Parse command-line options */ while((opt = getopt(argc, argv, "hel:")) != -1) { 
 		switch(opt) {
 		case 'h':
 			usage();
 			exit(0);
+			break;
 		case 'l':
-			
-			exit(0);
+			options.lenght = strtol(optarg,NULL,0);
+			break;
 		case 'e':
-			
-			exit(0);
+			options.par_mode = EVEN;
+			break;
 		default:
 			exit(EXIT_FAILURE);
 		}
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 		usage();
 		exit(EXIT_FAILURE);
 	}
-	
+	options.title = argv[optind];
 	/* Fill options.title with the corresponding element of argv */
 	// options.title = argv[xxxx];
 
