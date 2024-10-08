@@ -40,11 +40,14 @@ passwd_entry_t* parse_passwd(struct options* options, int* nr_entries)
 	int entry_idx;
 	int entry_count=0;
 	int cur_line;
-
-	if ((passwd=fopen("/etc/passwd","r"))==NULL) {
+	
+	
+	if (options->infile == NULL && (passwd=fopen("/etc/passwd","r"))==NULL) {
 		fprintf(stderr, "/etc/passwd could not be opened: ");
 		perror(NULL);
 		return NULL;
+	}else{
+		passwd = options->infile;
 	}
 
 	/* Figure out number of lines */
@@ -100,15 +103,15 @@ passwd_entry_t* parse_passwd(struct options* options, int* nr_entries)
 				}
 				break;
 			case USER_NAME_IDX:
-				cur_entry->user_name=clone_string(token);
+				cur_entry->user_name=strdup(token);
 				break;
 			case USER_HOME_IDX:
-				cur_entry->user_home=clone_string(token);
+				cur_entry->user_home=strdup(token);
 				break;
 			case USER_SHELL_IDX:
 				/* remove new line from token */
 				token[strlen(token)-1]='\0';
-				cur_entry->user_shell=clone_string(token);
+				cur_entry->user_shell=strdup(token);
 				break;
 			default:
 				break;
@@ -183,6 +186,14 @@ static int show_passwd(struct options* options)
 			        e->login_name, e->optional_encrypted_passwd,
 			        e->uid, e->gid,e->user_name,
 			        e->user_home, e->user_shell);
+			break;
+		case CSV_MODE:
+			fprintf(options->outfile,",%s,%s,%d,%d,%s,%s,%s,\n",
+                                e->login_name, e->optional_encrypted_passwd,
+                                e->uid, e->gid,e->user_name,
+                                e->user_home, e->user_shell);
+
+			break;
 		}
 
 	}
@@ -200,10 +211,10 @@ int main(int argc, char *argv[])
 	options.output_mode=VERBOSE_MODE;
 
 	/* Parse command-line options */
-	while((opt = getopt(argc, argv, "hvpo:")) != -1) {
+	while((opt = getopt(argc, argv, "hvcpo:i:")) != -1) {
 		switch(opt) {
 		case 'h':
-			fprintf(stderr,"Usage: %s [ -h | -v | -p | -o <output_file> ]\n",argv[0]);
+			fprintf(stderr,"Usage: %s [ -h | -v | -p | -o <output_file>| -i <input_file> ]\n",argv[0]);
 			exit(0);
 		case 'v':
 			options.output_mode=VERBOSE_MODE;
@@ -219,6 +230,21 @@ int main(int argc, char *argv[])
 				exit(EXIT_FAILURE);
 			}
 			break;
+		case 'i':
+			if((options.infile=fopen(optarg,"r"))==NULL)
+			{
+				fprintf(stderr, "The input file %s could not be opened: ",
+                                        optarg);
+                                perror(NULL);
+                                exit(EXIT_FAILURE);
+
+			}
+
+			break;
+		case 'c':
+
+			options.output_mode=CSV_MODE;
+			break;
 		default:
 			exit(EXIT_FAILURE);
 		}
@@ -227,3 +253,4 @@ int main(int argc, char *argv[])
 	retCode=show_passwd(&options);
 	exit(retCode);
 }
+
