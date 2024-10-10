@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 	ret_code = 0;
 
 	/* Parse command-line options (incomplete code!) */
-	while ((opt = getopt(argc, argv, "hi:")) != -1)
+	while ((opt = getopt(argc, argv, "hi:p")) != -1)
 	{
 		switch (opt)
 		{
@@ -48,6 +48,9 @@ int main(int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 		case 'i':
 			options.input_file = optarg;
+			break;
+		case 'p':
+			options.action = PRINT_TEXT_ACT;
 			break;
 		
 		/**
