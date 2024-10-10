@@ -10,7 +10,20 @@
 
 int print_text_file(char *path)
 {
+	FILE* file;
 	/* To be completed (part A) */
+	file=fopen(path,"r");
+	int num;
+
+	fscanf(file,"%d",&num);
+	
+	student_t studen;
+	for(int i=0;i<num;i++){
+		fscanf(file,"%i:%s :%s :%s",&studen.student_id,studen.NIF,studen.first_name,studen.last_name );
+	}
+
+
+
 	return 0;
 }
 
