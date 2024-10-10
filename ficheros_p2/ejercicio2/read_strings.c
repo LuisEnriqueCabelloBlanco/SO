@@ -15,13 +15,32 @@
  * Returns: !=NULL if success, NULL if error
  */
 char *loadstr(FILE *file)
-{
+{	
+	
+	int ind = 'a';
+	int size = 0;
+	while(ind != '\0'){
+		ind =fgetc(file);
+		size++;
+	}
+	fseek(file,-size,SEEK_CUR);
+	char* buff= malloc(size);
+	fread(buff,sizeof(char),size,file);
 	/* To be completed */
-	return NULL;	
+	return buff;	
 }
 
 int main(int argc, char *argv[])
 {
+	FILE* file = fopen(argv[1],"r");
+	
+
+	while(getc(file)!=EOF){
+		fseek(file,-1,SEEK_CUR);
+		char* word = loadstr(file);
+		printf("%s\n",word);
+	}
 	/* To be completed */
+	fclose(file);
 	return 0;
 }
