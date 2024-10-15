@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <unistd.h> /* for getopt() */
 #include <stdlib.h> /* for EXIT_SUCCESS, EXIT_FAILURE */
@@ -17,9 +18,16 @@ int print_text_file(char *path)
 
 	fscanf(file,"%d",&num);
 	
+
 	student_t studen;
+
+	char* aux=malloc(60);
 	for(int i=0;i<num;i++){
-		fscanf(file,"%i:%s :%s :%s",&studen.student_id,studen.NIF,studen.first_name,studen.last_name );
+		fscanf(file,"%i:%s",&studen.student_id,aux);
+		strcpy(studen.NIF,strsep(&aux,":"));
+		studen.first_name = strsep(&aux,":");
+		studen.last_name = aux;
+		printf("[Entry #%d]\n\tstudent_id=%d\n\tNIF=%s\n\tfirst_name=%s\n\tlast_name=%s\n",i,studen.student_id,studen.NIF,studen.first_name,studen.last_name);
 	}
 
 
@@ -36,6 +44,30 @@ int print_binary_file(char *path)
 
 int write_binary_file(char *input_file, char *output_file)
 {
+	FILE* i_file = fopen(input_file,"r");
+	FILE* o_file = fopen(output_file,"w");
+
+	int num;
+
+        fscanf(i_file,"%d",&num);
+        student_t studen;
+
+	char* aux=malloc(60);
+        for(int i=0;i<num;i++){
+                fscanf(i_file,"%i:%s",&studen.student_id,aux);
+                strcpy(studen.NIF,strsep(&aux,":"));
+                studen.first_name = strsep(&aux,":");
+                studen.last_name = aux;
+
+		fwrite(&num,sizeof(int),1,o_file);
+		fwrite(&studen.student_id,sizeof(int),1,o_file);
+		fwrite(&studen.NIF,sizeof(char),9+1,o_file);
+		fwrite(&studen.first_name,sizeof(char),strlen(studen.first_name)+1 ,o_file);
+		fwrite(&studen.last_name,sizeof(char),strlen(studen.last_name)+1 ,o_file);
+
+
+        }
+
 	/* To be completed  (part C) */
 	return 0;
 }
@@ -52,15 +84,19 @@ int main(int argc, char *argv[])
 	ret_code = 0;
 
 	/* Parse command-line options (incomplete code!) */
-	while ((opt = getopt(argc, argv, "hi:p")) != -1)
+	while ((opt = getopt(argc, argv, "hi:po:")) != -1)
 	{
 		switch (opt)
 		{
 		case 'h':
-			fprintf(stderr, "Usage: %s [ -h ]\n", argv[0]);
+			fprintf(stderr, "Usage: %s [ -h -p | -i file | -o<output_file> ]\n", argv[0]);
 			exit(EXIT_SUCCESS);
 		case 'i':
 			options.input_file = optarg;
+			break;
+		case 'o':
+			options.output_file = optarg;
+			options.action = WRITE_BINARY_ACT;
 			break;
 		case 'p':
 			options.action = PRINT_TEXT_ACT;
