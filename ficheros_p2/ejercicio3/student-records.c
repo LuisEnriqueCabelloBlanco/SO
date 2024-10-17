@@ -1,4 +1,5 @@
 
+
 #include <stdio.h>
 #include <unistd.h> /* for getopt() */
 #include <stdlib.h> /* for EXIT_SUCCESS, EXIT_FAILURE */
@@ -8,6 +9,23 @@
 
 /* Assume lines in the text file are no larger than 100 chars */
 #define MAXLEN_LINE_FILE 100
+
+
+char *loadstr(FILE *file)
+{	
+	
+	int ind = 'a';
+	int size = 0;
+	while(ind != '\0'){
+		ind =fgetc(file);
+		size++;
+	}
+	fseek(file,-size,SEEK_CUR);
+	char* buff= malloc(size);
+	fread(buff,sizeof(char),size,file);
+	/* To be completed */
+	return buff;	
+}
 
 int print_text_file(char *path)
 {
@@ -31,12 +49,32 @@ int print_text_file(char *path)
 	}
 
 
-
+	fclose(file);
 	return 0;
 }
 
 int print_binary_file(char *path)
 {
+	        FILE* file;
+        /* To be completed (part A) */
+        file=fopen(path,"r");
+        int num;
+
+        fread(&num,sizeof(int),1,file);
+
+
+        student_t studen;
+        
+        for(int i=0;i<num;i++){
+		fread(&studen.student_id,sizeof(int),1,file);
+                fscanf(file,"%10s",studen.NIF);
+                studen.first_name = loadstr(file);
+               	studen.last_name = loadstr(file);
+                printf("[Entry #%d]\n\tstudent_id=%d\n\tNIF=%s\n\tfirst_name=%s\n\tlast_name=%s\n",i,studen.student_id,studen.NIF,studen.first_name,studen.last_name);
+
+        }
+
+
 	/* To be completed  (part B) */
 	return 0;
 }
@@ -52,6 +90,8 @@ int write_binary_file(char *input_file, char *output_file)
         fscanf(i_file,"%d",&num);
         student_t studen;
 
+	fwrite(&num,sizeof(int),1,o_file);
+
 	char* aux=malloc(60);
         for(int i=0;i<num;i++){
                 fscanf(i_file,"%i:%s",&studen.student_id,aux);
@@ -59,11 +99,11 @@ int write_binary_file(char *input_file, char *output_file)
                 studen.first_name = strsep(&aux,":");
                 studen.last_name = aux;
 
-		fwrite(&num,sizeof(int),1,o_file);
+		
 		fwrite(&studen.student_id,sizeof(int),1,o_file);
 		fwrite(&studen.NIF,sizeof(char),9+1,o_file);
-		fwrite(&studen.first_name,sizeof(char),strlen(studen.first_name)+1 ,o_file);
-		fwrite(&studen.last_name,sizeof(char),strlen(studen.last_name)+1 ,o_file);
+		fwrite(studen.first_name,sizeof(char),strlen(studen.first_name)+1 ,o_file);
+		fwrite(studen.last_name,sizeof(char),strlen(studen.last_name)+1 ,o_file);
 
 
         }
@@ -84,7 +124,7 @@ int main(int argc, char *argv[])
 	ret_code = 0;
 
 	/* Parse command-line options (incomplete code!) */
-	while ((opt = getopt(argc, argv, "hi:po:")) != -1)
+	while ((opt = getopt(argc, argv, "hi:po:b")) != -1)
 	{
 		switch (opt)
 		{
@@ -101,7 +141,9 @@ int main(int argc, char *argv[])
 		case 'p':
 			options.action = PRINT_TEXT_ACT;
 			break;
-		
+		case 'b':
+			options.action = PRINT_BINARY_ACT;
+			break;
 		/**
 		 **  To be completed ...
 		 **/
