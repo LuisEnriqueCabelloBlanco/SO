@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 /* Forward declaration */
 int get_size_dir(char *fname, size_t *blocks);
@@ -9,7 +12,15 @@ int get_size_dir(char *fname, size_t *blocks);
  */
 int get_size(char *fname, size_t *blocks)
 {
-
+	struct stat buf;
+	lstat(fname,&buf);
+	if(S_ISDIR(buf.st_mode)){
+		return get_size_dir(fname,blocks);
+		
+	}else{
+		(*bocks)+=st_blocks;
+	}
+	return 0;
 }
 
 
@@ -19,7 +30,9 @@ int get_size(char *fname, size_t *blocks)
  */
 int get_size_dir(char *dname, size_t *blocks)
 {
+	DIR* dir =  opendir(name);
 
+	struct dirent* data = readdir(dir);
 }
 
 /* Processes all the files in the command line calling get_size on them to
@@ -28,6 +41,12 @@ int get_size_dir(char *dname, size_t *blocks)
  */
 int main(int argc, char *argv[])
 {
+
+	
+	for(int i = 1;i<argc;i++){
+		int size;
+		get_size(argv[i],&size);
+	}
 
 	return 0;
 }
