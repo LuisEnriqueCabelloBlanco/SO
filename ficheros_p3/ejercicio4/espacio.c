@@ -18,7 +18,7 @@ int get_size(char *fname, size_t *blocks)
 		return get_size_dir(fname,blocks);
 		
 	}else{
-		(*bocks)+=st_blocks;
+		(*blocks)+=buf.st_blocks;
 	}
 	return 0;
 }
@@ -30,9 +30,27 @@ int get_size(char *fname, size_t *blocks)
  */
 int get_size_dir(char *dname, size_t *blocks)
 {
-	DIR* dir =  opendir(name);
+	DIR* dir;
 
-	struct dirent* data = readdir(dir);
+	dir = opendir(dname);
+
+	struct dirent* data;
+	readdir(dir);
+	readdir(dir);
+	while((data=readdir(dir))!=NULL){
+		struct stat b;
+		lstat(data->d_name,&b);
+
+		if(S_ISDIR(b.st_mode)){
+			get_size_dir(data->d_name,blocks);
+		}else{
+			(*blocks)+=b.st_blocks;
+		}
+	}
+
+	closedir(dir);
+
+	return 0;
 }
 
 /* Processes all the files in the command line calling get_size on them to
@@ -44,8 +62,11 @@ int main(int argc, char *argv[])
 
 	
 	for(int i = 1;i<argc;i++){
-		int size;
+		size_t size=0;
 		get_size(argv[i],&size);
+		size /= 2;
+		printf("%ln K %s\n",&size,argv[i]);
+		//printf("%n",&size);
 	}
 
 	return 0;
