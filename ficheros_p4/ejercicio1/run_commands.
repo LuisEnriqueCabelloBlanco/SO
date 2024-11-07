@@ -20,6 +20,21 @@ pid_t launch_command(char** argv){
 }
 
 
+pid_t launch_command_n(char** argv){
+    /* To be completed */
+	pid_t pid = fork();
+	if(pid == -1){
+		printf("Process could not be created\n");
+		exit(EXIT_FAILURE);
+	}else if(pid == 0){//child
+		execvp(argv[0],argv);
+		//exit(0);
+	}else{//parent
+		waitpid(pid,NULL,0);
+	}
+    return pid;
+}
+
 
 char **parse_command(const char *cmd, int* argc) {
     // Allocate space for the argv array (initially with space for 10 args)
