@@ -5,6 +5,11 @@
 #define CAPACITY 5
 #define VIPSTR(vip) ((vip) ? "  vip  " : "not vip")
 
+struct cliente{
+	int id;
+	int isVip;
+};
+
 void enter_normal_client(int id)
 {
 
@@ -28,16 +33,30 @@ void disco_exit(int id, int isvip)
 
 void *client(void *arg)
 {
-	if(isvip)
-		enter_vip_client();
+	struct cliente* c = arg;
+	if(c->isVip)
+		enter_vip_client(c->id);
 	else
-		enter_normal_client();
-	dance();
-	exit_client();
+		enter_normal_client(c->id);
+	dance(c->id,c->isVip);
+	disco_exit(c->id,c->isVip);
 }
 
 int main(int argc, char *argv[])
 {
+	int numCli =0;
+
+	FILE* file = fopen(argv[1],"r");
+
+	fscanf(file,"%d",&numCli);
+	int aux;
+	for(int i = 0; i< numCli;i++)
+	{
+		fscanf(file,"%d",&aux);
+		struct cliente cli;
+		cli.id = i;
+		cli.isVip = aux;
+	}
 
 	return 0;
 }
